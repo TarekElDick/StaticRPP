@@ -2,11 +2,9 @@
 #include <iostream>
 #include <iomanip>
 #include <queue>
-
-
-
-
-
+#include <fstream>
+#include <sstream>
+#include <string>
 
 
 namespace RPP
@@ -149,7 +147,6 @@ namespace RPP
         }
     }
 
-
     void Map::printToConsole(bool showBinary) const
     {
         if (showBinary) 
@@ -260,6 +257,165 @@ namespace RPP
         }
     }
 
+    void Map::saveToFile(const std::string& filename) {
+        
+        // Save the Map object to a file
+        std::ofstream outfile(filename);
+        if (outfile.is_open()) {
+            serializeMap(outfile);
+            outfile.close();
+        }
+        else {
+            std::cout << "Unable to open file: "<< filename << std::endl;
+            throw std::invalid_argument("Unable to open file");
+        }
+        
+    }
+
+    void Map::loadFromFile(std::string& filename) {
+        
+        // Load the Map object from the file
+        std::ifstream infile(filename);
+        if (infile.is_open()) {
+            try {
+            
+                this->deserializeMap(infile);
+                infile.close();
+            }
+            catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
+
+            }
+        }
+        else {
+            std::cout << "Unable to open file :" << filename << std::endl;
+            throw std::invalid_argument("Unable to open file: " + filename);
+        }
+       
+    }
+
+    void Map::serializeMap(std::ofstream& file) const {
+        if (file) {
+            // Write the object's data members to the file
+            file.write(reinterpret_cast<const char*>(&numRows_), sizeof(numRows_));
+            file.write(reinterpret_cast<const char*>(&numCols_), sizeof(numCols_));
+
+            for (const auto& row : grid_) {
+                for (const auto& node : row) {
+                    node.serializeNode(file);
+                }
+            }
+
+            size_t num_obstacles = obstaclesList_.size();
+
+            file.write(reinterpret_cast<const char*>(&num_obstacles), sizeof(num_obstacles));
+
+            for (const auto& obstacle : obstaclesList_) {
+                obstacle.serializeObstacle(file);
+            }
+            file.close();
+        }
+    }
+
+    void Map::deserializeMap(std::ifstream& file) {
+        
+        if (file) {
+            // Read the object's data members from the file
+           
+            int num_rows, num_cols;
+            file.read(reinterpret_cast<char*>(&num_rows), sizeof(num_rows));
+            file.read(reinterpret_cast<char*>(&num_cols), sizeof(num_cols));
+
+            // Create a new Map object with the correct size
+            Map new_map(num_rows, num_cols);
+            // Read the grid data into the new Map object
+            for (auto& row : new_map.getGrid()) {
+                for (auto& node : row) {
+                    node.deserializeNode(file);
+                }
+            }
+            // Read the obstacle data into the new Map object
+            size_t num_obstacles;
+            file.read(reinterpret_cast<char*>(&num_obstacles), sizeof(num_obstacles));
+            new_map.obstaclesList_.resize(num_obstacles);
+
+            for (auto& obstacle : new_map.obstaclesList_) {
+                obstacle.deserializeObstacle(file);
+            }
+            // Assign the new Map object to the current object
+            using std::swap;
+            swap(*this, new_map);
+            
+            file.close();
+        }
+    }
+    
+    void Node::serializeNode(std::ostream& os) const {
+        os.write(reinterpret_cast<const char*>(&x_), sizeof(x_));
+        os.write(reinterpret_cast<const char*>(&y_), sizeof(y_));
+        os.write(reinterpret_cast<const char*>(&isObstacle_), sizeof(isObstacle_));
+        os.write(reinterpret_cast<const char*>(&distanceToObstacle_), sizeof(distanceToObstacle_));
+        os.write(reinterpret_cast<const char*>(&isStart_), sizeof(isStart_));
+        os.write(reinterpret_cast<const char*>(&isEnd_), sizeof(isEnd_));
+        os.write(reinterpret_cast<const char*>(&isRobot_), sizeof(isRobot_));
+        os.write(reinterpret_cast<const char*>(&isPath_), sizeof(isPath_));
+        os.write(reinterpret_cast<const char*>(&isBestPath_), sizeof(isBestPath_));
+        os.write(reinterpret_cast<const char*>(&heuristic_), sizeof(heuristic_));
+        os.write(reinterpret_cast<const char*>(&gScore_), sizeof(gScore_));
+        os.write(reinterpret_cast<const char*>(&f_), sizeof(f_));
+        const std::int32_t  parent_index = (parent_ == nullptr) ? -1 : 1;
+        os.write(reinterpret_cast<const char*>(&parent_index), sizeof(parent_index));
+
+        if (parent_index != -1) {
+            parent_->serializeNode(os);
+        }
+    }
+
+    void Node::deserializeNode(std::istream& is) {
+        if (is) {
+            is.read(reinterpret_cast<char*>(&x_), sizeof(x_));
+            is.read(reinterpret_cast<char*>(&y_), sizeof(y_));
+            is.read(reinterpret_cast<char*>(&isObstacle_), sizeof(isObstacle_));
+            is.read(reinterpret_cast<char*>(&distanceToObstacle_), sizeof(distanceToObstacle_));
+            is.read(reinterpret_cast<char*>(&isStart_), sizeof(isStart_));
+            is.read(reinterpret_cast<char*>(&isEnd_), sizeof(isEnd_));
+            is.read(reinterpret_cast<char*>(&isRobot_), sizeof(isRobot_));
+            is.read(reinterpret_cast<char*>(&isPath_), sizeof(isPath_));
+            is.read(reinterpret_cast<char*>(&isBestPath_), sizeof(isBestPath_));
+            is.read(reinterpret_cast<char*>(&heuristic_), sizeof(heuristic_));
+            is.read(reinterpret_cast<char*>(&gScore_), sizeof(gScore_));
+            is.read(reinterpret_cast<char*>(&f_), sizeof(f_));
+            std::int32_t  parent_index;
+            is.read(reinterpret_cast<char*>(&parent_index), sizeof(parent_index));
+
+            if (parent_index != -1) {
+                parent_ = new Node();
+                parent_->deserializeNode(is);
+                
+            }
+        }
+    }
+
+    
+    void Obstacle::serializeObstacle(std::ostream& os) const {
+        os.write(reinterpret_cast<const char*>(&obstacleCenterNode_), sizeof(obstacleCenterNode_));
+        os.write(reinterpret_cast<const char*>(&obstacleRadius_), sizeof(obstacleRadius_));
+    }
+
+    void Obstacle::deserializeObstacle(std::istream& is) {
+        if (is.good()) {
+            is.read(reinterpret_cast<char*>(&obstacleCenterNode_), sizeof(obstacleCenterNode_));
+        }
+        else {
+            throw std::runtime_error("Failed to read obstacle center node");
+        }
+        if (is.good()) {
+            is.read(reinterpret_cast<char*>(&obstacleRadius_), sizeof(obstacleRadius_));
+        }
+        else {
+            throw std::runtime_error("Failed to read obstacle radius");
+        }
+    }
 
 
 }
