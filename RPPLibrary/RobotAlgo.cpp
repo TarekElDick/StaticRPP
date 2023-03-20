@@ -29,7 +29,7 @@ namespace RPP
 			throw std::invalid_argument("End node is outside the bounds of the map.");
 		}
 		
-		std::cout << "endNode->getRow() " << endNode->getRow() << " endNode->getCol() " << endNode->getCol() << std::endl;
+		
 		// TODO Validate that the starting node and end node are not touching obstacle nodes, and that the robot fits at the nodes.
 
 

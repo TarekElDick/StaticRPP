@@ -2,46 +2,64 @@
 #include <RobotMap.h>
 #include <RobotAlgo.h>
 #include "RobotClient.h"
-using namespace std;
 
+using namespace std;
 
 int main()
 {
+    bool redo = true;
+    while (redo) {
+        try {
 
-    // 1) Create Map Object 
-    //      Initalize map object with the desired number of Rows, Columns.
-    try {
+            int width, height, startX, startY, endX, endY;
+            cout << "Enter the width of the map: ";
+            cin >> width;
+            cout << "Enter the height of the map: ";
+            cin >> height;
+            RPP::Map myMap(width, height);
+            cout << "Enter the number of obstacles you want to create: ";
+            int numObstacles;
+            cin >> numObstacles;
+            for (int i = 0; i < numObstacles; i++) {
+                int x, y, size;
+                cout << "Enter the coordinates and size of obstacle " << i + 1 << ": ";
+                cin >> x >> y >> size;
+                myMap.createObstacle(x, y, size);
+            }
+            myMap.addObstaclesToMap(myMap.getObstaclesList());
 
+            cout << "Enter the starting node coordinates: ";
+            cin >> startX >> startY;
+            RPP::Node startNode(startX, startY);
+            cout << "Enter the ending node coordinates: ";
+            cin >> endX >> endY;
+            RPP::Node endNode(endX, endY);
+            
+            int robotRadius;
+            cout << "Enter the radius of the robot: ";
+            cin >> robotRadius;
+            
+            RPP::Algorithm myAlgo(myMap, &startNode, &endNode, robotRadius);
 
-        // 1) Create Map Object 
-        // Initalize map object with the desired number of Rows, Columns.
-        RPP::Map myMap(5,5);
+            bool visualize;
+            cout << "Do you want to visualize the robots movement? (1 for Yes, 0 for No): ";
+            cin >> visualize;
+            if (visualize == 1 || visualize == 0) {
+                myAlgo.startPathPlanning(visualize);
+            }
+            else {
+                throw std::invalid_argument("Invalid entry");
+            }
 
-        // 2) Create your ostacles this function adds the ostacles in a list. 
-        myMap.createObstacle(2, 2, 1);
-        myMap.addObstaclesToMap(myMap.getObstaclesList());
-
-        string filename = "test1.bin";
-        
-        RPP::Map yourMap;
-
-        myMap.saveToFile(filename);
-        yourMap.loadFromFile(filename);
-        
-        RPP::Node startNode(0,0);
-        RPP::Node endNode(4, 4);
-        
-        RPP::Algorithm myAlgo(yourMap, &startNode, &endNode, 0);
-
-        myAlgo.startPathPlanning(true);
-
-       
-    }
-    catch (const std::invalid_argument& e) {
-        std::cout << "Exception caught: " << e.what() << std::endl;
+            cout << "Do you want to redo the test? (1 for Yes, 0 for No): ";
+            cin >> redo;
+        }
+        catch (const std::invalid_argument& e) {
+            std::cout << "Exception caught: " << e.what() << std::endl;
+            redo = true;
+        }
     }
 
     std::cout << "Finished ";
     return 0;
-
 }
