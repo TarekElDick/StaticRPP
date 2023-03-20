@@ -2,8 +2,8 @@
 #include <RobotMap.h>
 #include <RobotAlgo.h>
 #include "RobotClient.h"
-
 using namespace std;
+
 
 int main()
 {
@@ -14,32 +14,28 @@ int main()
 
 
         // 1) Create Map Object 
-        //      Initalize map object with the desired number of Rows, Columns.
-        RPP::Map myMap(100,20);
+        // Initalize map object with the desired number of Rows, Columns.
+        RPP::Map myMap(5,5);
 
         // 2) Create your ostacles this function adds the ostacles in a list. 
-        myMap.createObstacle(5, 5, 1);
-        myMap.createObstacle(17, 5, 3);
-        myMap.createObstacle(25, 7, 2);
-        myMap.createObstacle(50, 10, 4);
+        myMap.createObstacle(2, 2, 1);
         myMap.addObstaclesToMap(myMap.getObstaclesList());
 
-        //myMap.printToConsole(1);
+        string filename = "test1.bin";
         
-        RPP::Node startNode(1,1);
-        RPP::Node endNode(99, 19);
-        RPP::AlgorithmType algoType = RPP::AlgorithmType::AStar;
+        RPP::Map yourMap;
 
-
-        RPP::Algorithm myAlgo(myMap, &startNode, &endNode, algoType, 1);
-
-        myAlgo.startPathPlanning(false);
+        myMap.saveToFile(filename);
+        yourMap.loadFromFile(filename);
         
-        myMap.printToConsole(0);
-        myMap.printToConsole(1);
-        myAlgo.printHeuristic();
-
+        RPP::Node startNode(0,0);
+        RPP::Node endNode(4, 4);
         
+        RPP::Algorithm myAlgo(yourMap, &startNode, &endNode, 0);
+
+        myAlgo.startPathPlanning(true);
+
+       
     }
     catch (const std::invalid_argument& e) {
         std::cout << "Exception caught: " << e.what() << std::endl;

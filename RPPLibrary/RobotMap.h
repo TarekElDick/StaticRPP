@@ -12,7 +12,8 @@ namespace RPP
         double max = 999999999;
 
         public:
-      
+            
+            // Default Contructor
             Node(int x = -1, int y = -1)
                 :
                 x_(x),
@@ -28,7 +29,6 @@ namespace RPP
                 gScore_(0.0),
                 f_(0.0),
                 parent_(nullptr)
-                
             {}
 
             // Setters
@@ -56,10 +56,13 @@ namespace RPP
             bool isPath() const { return isPath_; }
             bool isBestPath() const { return isBestPath_; }
             std::vector<Node*>& getNeighbors() { return neighbors_; }
-            double getHeuristic() { return heuristic_; }
-            double getGScore() { return gScore_; }
-            double getF() { return f_; }
-            Node* getParent() { return parent_; }
+            double getHeuristic() const { return heuristic_; }
+            double getGScore() const { return gScore_; }
+            double getF() const { return f_; }
+            Node* getParent() const { return parent_; }
+
+            void serializeNode(std::ostream& os) const;
+            void deserializeNode(std::istream& is);
 
         private:
         
@@ -107,6 +110,9 @@ namespace RPP
             // Static factory function
             static Obstacle createObstacle(int x, int y, int radius);
 
+            void serializeObstacle(std::ostream& os) const;
+            void deserializeObstacle(std::istream& is);
+
         private:
         
             Node obstacleCenterNode_;
@@ -126,11 +132,11 @@ namespace RPP
                 obstaclesList_()
             {}
             
-            
-
             // Constructor with arguments
-            Map(int numRows , int numCols);
-            void setNeighbors();// set neighbors for each node
+            Map(int numRows, int numCols);
+            
+            // Sets neighbors for each node
+            void setNeighbors();
             
             // Getters
             int getNumRows() const { return numRows_; }
@@ -141,8 +147,13 @@ namespace RPP
             // Member Functions
             void createObstacle(int x, int y, int radius);
             void addObstaclesToMap(const std::vector<Obstacle>& obstaclesList);
-            void printToConsole(bool showBinary) const;      
+            void printToConsole(bool showBinary) const;     
+            
+            void serializeMap(std::ofstream& file) const;
+            void deserializeMap(std::ifstream& file);
 
+            void saveToFile(const std::string& filename);
+            void loadFromFile(std::string& filename);
 
         private:                                                                   
             int numRows_;                                                                               
@@ -150,8 +161,7 @@ namespace RPP
             std::vector<std::vector<Node>> grid_;                                                       
             std::vector<Obstacle> obstaclesList_;                                                       
         
-        
-        
+
     };
 
 }

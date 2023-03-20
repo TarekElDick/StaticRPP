@@ -8,14 +8,13 @@
 
 namespace RPP
 {
-	Algorithm::Algorithm(Map& map, Node* startNode, Node* endNode, AlgorithmType algorithmType, int robotRadius ) 
+	Algorithm::Algorithm(Map& map, Node* startNode, Node* endNode, int robotRadius ) 
 		:
 		map_(map),
 		startNode_(nullptr),  // temporary Node object to bind to startNode_ reference
 		endNode_(nullptr),  // temporary Node object to bind to endNode_ reference
 		robotPosition_(nullptr),
 		path_(),
-		algorithmType_(algorithmType),
 		robotRadius_(robotRadius)
 	{
 		
@@ -29,7 +28,8 @@ namespace RPP
 			endNode->getCol() < 0 || endNode->getCol() >= map.getNumCols()) {
 			throw std::invalid_argument("End node is outside the bounds of the map.");
 		}
-
+		
+		std::cout << "endNode->getRow() " << endNode->getRow() << " endNode->getCol() " << endNode->getCol() << std::endl;
 		// TODO Validate that the starting node and end node are not touching obstacle nodes, and that the robot fits at the nodes.
 
 
@@ -40,7 +40,6 @@ namespace RPP
 		startNode_ = &grid[startNode->getRow()][startNode->getCol()];
 		startNode_->setIsStart();
 
-
 		// Get a reference to the end node in the grid and set it as the end node
 		endNode_ = &grid[endNode->getRow()][endNode->getCol()];
 		endNode_->setIsEnd();
@@ -48,11 +47,9 @@ namespace RPP
 		// Set the robots position on the map before we start algo.
 		setRobotPosition(startNode_,0);
 
-		// TODO Set Heuristic of each Node
+		// Set Heuristic of each Node
 		setNodeHeuristic();
-
-		// TODO Set Cost of each node. 
-	
+		
 	}
 
 	void Algorithm::setRobotPosition(Node * newRobotPosition, bool v) {
@@ -168,7 +165,6 @@ namespace RPP
 				Node* node = &grid[row][col];
 				if (node->isObstacle()) {
 					std::cout << "\033[31m"; // red
-
 				}
 				else if (node->isStart()) {
 					std::cout << "\033[34m"; // blue
@@ -217,9 +213,7 @@ namespace RPP
 	}
 
 	void Algorithm::startPathPlanning(bool v) {
-
 		
-		std::vector<std::vector<Node>>& grid = map_.getGrid();
 		// A* Search Algorithm
 
 		// 1. Create an empty set of open nodes and a set of closed nodes
@@ -318,6 +312,7 @@ namespace RPP
 
 		// If we reach this point, it means there is no path from the start node to the goal node
 		std::cout << "No Path Found!" << std::endl;
+		
 	}
 
 	void Algorithm::visualizer() {
