@@ -137,7 +137,9 @@ namespace RPP
             
             // Sets neighbors for each node
             void setNeighbors();
-            
+            void setNumRows(int numRows)  { numRows_ = numRows; }
+            void setNumCols(int numCols)  { numCols_ = numCols; }
+
             // Getters
             int getNumRows() const { return numRows_; }
             int getNumCols() const { return numCols_; }

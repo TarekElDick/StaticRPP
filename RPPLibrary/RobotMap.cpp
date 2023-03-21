@@ -50,7 +50,7 @@ namespace RPP
                         }
                         int nrow = row + r;
                         int ncol = col + c;
-                        if (nrow >= 0 && nrow < numRows_ && ncol >= 0 && ncol < numCols_) {
+                        if (nrow >= 0 && nrow < numRows_  && ncol >= 0 && ncol < numCols_ ) {
                             node->getNeighbors().push_back(&grid_[nrow][ncol]);
                         }
                     }
@@ -396,7 +396,6 @@ namespace RPP
         }
     }
 
-    
     void Obstacle::serializeObstacle(std::ostream& os) const {
         os.write(reinterpret_cast<const char*>(&obstacleCenterNode_), sizeof(obstacleCenterNode_));
         os.write(reinterpret_cast<const char*>(&obstacleRadius_), sizeof(obstacleRadius_));
