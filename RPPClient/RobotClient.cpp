@@ -16,7 +16,8 @@ int main()
             cin >> width;
             cout << "Enter the height of the map: ";
             cin >> height;
-            RPP::Map myMap(width, height);
+            RPP::Map* myMap = new RPP::Map(width, height);
+            myMap->printToConsole(true);
             cout << "Enter the number of obstacles you want to create: ";
             int numObstacles;
             cin >> numObstacles;
@@ -24,23 +25,23 @@ int main()
                 int x, y, size;
                 cout << "Enter the coordinates and size of obstacle " << i + 1 << ": ";
                 cin >> x >> y >> size;
-                myMap.createObstacle(x, y, size);
+                myMap->createObstacle(x, y, size);
             }
-            myMap.addObstaclesToMap(myMap.getObstaclesList());
-
+            myMap->addObstaclesToMap(myMap->getObstaclesList());
+            myMap->printToConsole(true);
             cout << "Enter the starting node coordinates: ";
             cin >> startX >> startY;
             RPP::Node startNode(startX, startY);
             cout << "Enter the ending node coordinates: ";
             cin >> endX >> endY;
             RPP::Node endNode(endX, endY);
-            
+
             int robotRadius;
             cout << "Enter the radius of the robot: ";
             cin >> robotRadius;
-            
-            RPP::Algorithm myAlgo(myMap, &startNode, &endNode, robotRadius);
 
+            RPP::Algorithm myAlgo(*myMap, &startNode, &endNode, robotRadius);
+            myMap->printToConsole(true);
             bool visualize;
             cout << "Do you want to visualize the robots movement? (1 for Yes, 0 for No): ";
             cin >> visualize;
@@ -53,6 +54,9 @@ int main()
 
             cout << "Do you want to redo the test? (1 for Yes, 0 for No): ";
             cin >> redo;
+            if (redo) {
+                delete myMap;
+            }
         }
         catch (const std::invalid_argument& e) {
             std::cout << "Exception caught: " << e.what() << std::endl;

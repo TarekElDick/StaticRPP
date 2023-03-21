@@ -280,6 +280,17 @@ namespace RPP
 					continue;
 				}
 
+				// Validate that the robot doesnt go out of bounds while searching
+				if ( (neighbor->getRow() + getRobotRadius()) > map_.getNumRows()-1 || (neighbor->getCol() + getRobotRadius()) > map_.getNumCols()-1 ) {
+					continue;
+				}
+				// Validate that the robot doesnt go out of bounds while searching
+				if ( (neighbor->getRow() - getRobotRadius()) < 0 || (neighbor->getCol() - getRobotRadius()) < 0) {
+					continue;
+				}
+
+
+
 				// Calculate the tentative g score for the neighbor
 				// calculate the difference of the movement.
 				double dx = current->getCol() - neighbor->getCol();

@@ -4,10 +4,6 @@
 
 namespace RPP
 {
-	enum class AlgorithmType {
-		Dijkstra,
-		AStar
-	};
 	
 	class Algorithm
 	{
