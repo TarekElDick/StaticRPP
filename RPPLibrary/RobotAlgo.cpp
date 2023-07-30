@@ -215,16 +215,12 @@ namespace RPP
 	void Algorithm::startPathPlanning(bool v) {
 		
 		// A* Search Algorithm
-
 		// 1. Create an empty set of open nodes and a set of closed nodes
 		std::vector<Node*> openSet, closedSet;
-
 		// 2. Initialize the closed list put the starting node on the openlist(you can leave its f at zero)
 		startNode_->setHeuristic(0);
 		startNode_->setGScore(0);
 		startNode_->setF(0);
-
-		
 		openSet.push_back(startNode_);
 
 		// 3. While open list is not empty
@@ -320,10 +316,8 @@ namespace RPP
 			}
 				
 		}
-
 		// If we reach this point, it means there is no path from the start node to the goal node
 		std::cout << "No Path Found!" << std::endl;
-		
 	}
 
 	void Algorithm::visualizer() {
